@@ -1,0 +1,92 @@
+[
+  {
+    "filename": "fre_tomato_1.jpg",
+    "prediction": "Pepper__bell___healthy",
+    "confidence": 47.85518944263458,
+    "num_regions": 1
+  },
+  {
+    "filename": "fre_tomato_3.jpg",
+    "prediction": "Potato___healthy",
+    "confidence": 22.620363533496857,
+    "num_regions": 1
+  },
+  {
+    "filename": "healty_potato_1.jpg",
+    "prediction": "Potato___healthy",
+    "confidence": 39.33177292346954,
+    "num_regions": 1
+  },
+  {
+    "filename": "healty_potato_2.jpg",
+    "prediction": "Potato___healthy",
+    "confidence": 43.37858855724335,
+    "num_regions": 1
+  },
+  {
+    "filename": "healty_tom_leaves.jpg",
+    "prediction": "Pepper__bell___healthy",
+    "confidence": 47.85518944263458,
+    "num_regions": 1
+  },
+  {
+    "filename": "pepper_bell_bacterial_spott.jpg",
+    "prediction": "Pepper__bell___Bacterial_spot",
+    "confidence": 75.25033354759216,
+    "num_regions": 1
+  },
+  {
+    "filename": "pepper_bell_bacterial_spot_2.jpg",
+    "prediction": "Potato___healthy",
+    "confidence": 35.42550504207611,
+    "num_regions": 1
+  },
+  {
+    "filename": "pepper_bell_bacterial_spot_3.jpg",
+    "prediction": "Tomato_Early_blight",
+    "confidence": 47.11076021194458,
+    "num_regions": 1
+  },
+  {
+    "filename": "potato_early_blight.jpg",
+    "prediction": "Potato___Early_blight",
+    "confidence": 59.78262424468994,
+    "num_regions": 1
+  },
+  {
+    "filename": "potato_early_blight_2.jpg",
+    "prediction": "Potato___Early_blight",
+    "confidence": 28.71359884738922,
+    "num_regions": 1
+  },
+  {
+    "filename": "potato_late_blight_1.jpg",
+    "prediction": "Potato___Late_blight",
+    "confidence": 49.65338706970215,
+    "num_regions": 1
+  },
+  {
+    "filename": "potato_late_blight_2.jpg",
+    "prediction": "Tomato_Early_blight",
+    "confidence": 17.205724120140076,
+    "num_regions": 1
+  },
+  {
+    "filename": "tomato_early_blight_1.jpg",
+    "prediction": "Tomato_Early_blight",
+    "confidence": 44.17782723903656,
+    "num_regions": 1
+  },
+  {
+    "filename": "tomato_late_blight_2.jpeg",
+    "prediction": "Tomato_Early_blight",
+    "confidence": 49.22090768814087,
+    "num_regions": 1
+  },
+  {
+    "filename": "tomoto_late_blight.jpeg",
+    "prediction": "Tomato_Late_blight",
+    "confidence": 23.486459255218506,
+    "num_regions": 1
+  }
+]

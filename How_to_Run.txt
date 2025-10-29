@@ -1,0 +1,96 @@
+========================================
+ HOW TO RUN: AgriAssist Project
+========================================
+
+Thank you for evaluating AgriAssist. This document provides step-by-step instructions to run the complete full-stack application locally.
+
+The project consists of two main parts:
+1. A Python backend server that handles all AI processing.
+2. An HTML/JavaScript frontend that runs in your web browser.
+
+
+------------------------
+[ Prerequisites ]
+------------------------
+
+Before you begin, please ensure you have the following installed:
+
+1. Python 3.11 (This specific version is important for dependency compatibility).
+2. A modern web browser (e.g., Google Chrome, Mozilla Firefox) to support the Web Speech API for voice features.
+
+
+------------------------
+[ Part 1: Backend Setup & Execution ]
+------------------------
+
+This part involves setting up the Python environment and starting the AI server.
+
+1. Navigate to the Backend Folder:
+   Open a terminal (Command Prompt or PowerShell) and navigate into the `pulp_function_backend` directory.
+
+2. Create a Virtual Environment:
+   This command creates an isolated Python environment for the project.
+   > py -3.11 -m venv venv
+
+3. Activate the Virtual Environment:
+   You must activate the environment before installing packages.
+   - On Windows:
+     > .\venv\Scripts\activate
+   - On macOS/Linux:
+     > source venv/bin/activate
+
+   Your terminal prompt should now start with "(venv)".
+
+4. Install All Dependencies:
+   This command reads the `requirements.txt` file and installs all necessary libraries, including PyTorch, FastAPI, and Ultralytics. This step may take several minutes to complete.
+   > pip install -r requirements.txt
+
+5. Run the Backend Server:
+   This command starts the AI server. The initial startup will be slow (it may take a minute or two) as it loads the large AI models into memory.
+   > uvicorn main:app --reload
+
+   You will see output indicating the server is running on http://127.0.0.1:8000.
+
+   *** IMPORTANT: You must keep this terminal window open for the application to work. ***
+
+
+------------------------
+[ Part 2: Frontend Launch ]
+------------------------
+
+With the backend server running, you can now launch the user interface.
+
+1. Navigate to the Frontend Folder:
+   Open your computer's file explorer (not the terminal). Navigate into the `puppy_frontend` directory.
+
+2. Open the HTML File:
+   Find the file named `index.html` and double-click it. It will open in your default web browser.
+
+The application is now fully running.
+
+
+------------------------
+[ How to Use the Application ]
+------------------------
+
+1. Upload an Image: Click "Choose File" to select a leaf image from your computer. The AI will immediately process it and display the diagnosis and recommendations.
+
+2. Switch Languages: Use the "English" / "हिन्दी" buttons to toggle the language of the recommendations.
+
+3. Ask a Question: After a result is displayed, a new "Ask a Question" section will appear.
+   - Click the microphone icon (🎤). Your browser will ask for microphone permission. Please click "Allow".
+   - The microphone will turn red to indicate it's listening. Ask a question about the disease.
+   - The system will process your question and display an answer from its knowledge base.
+
+4. Voice Output: Click the speaker icon (🔊) next to a result to have the recommendations or the Q&A answer read aloud.
+
+
+------------------------
+[ Troubleshooting ]
+------------------------
+
+- "Could not connect to the backend server": This error means the Python server is not running. Please ensure the terminal from Part 1 is still open and running the `uvicorn` command.
+
+- Microphone Not Working: Make sure you have clicked "Allow" when your browser asked for microphone permission.
+
+- Hindi Voice Not Working: Some systems may require you to install the Hindi voice pack in your operating system's text-to-speech settings.

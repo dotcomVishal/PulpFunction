@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriAssist</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f4f0; margin: 0; padding: 1rem; box-sizing: border-box; }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; max-width: 500px; width: 100%; }
+        h1 { color: #2E7D32; }
+        h2 { display: flex; align-items: center; justify-content: space-between;}
+        #speak-btn { background: none; border: none; cursor: pointer; font-size: 24px; color: #555; }
+        #image-preview { max-width: 100%; max-height: 300px; margin-top: 1rem; border-radius: 8px; display: none; border: 1px solid #ddd; }
+        #results, #qna { text-align: left; margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1.5rem; }
+        #loader, #qna-loader { border: 4px solid #f3f3f3; border-top: 4px solid #2E7D32; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 1rem auto; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; cursor: pointer; background-color: #2E7D32; color: white; padding: 10px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; }
+        .upload-btn-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
+        ul { list-style-type: none; padding-left: 0; }
+        li { background-color: #f9f9f9; margin-bottom: 8px; padding: 10px; border-radius: 5px; border-left: 3px solid #2E7D32; }
+        .lang-switcher { margin-top: 1rem; }
+        .lang-btn { background: none; border: 1px solid #ddd; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        .lang-btn.active { background-color: #2E7D32; color: white; border-color: #2E7D32; }
+        #mic-btn { background: #eee; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; margin-top: 1rem; }
+        #mic-btn.listening { background: #ffcdd2; color: #c62828; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌿 AgriAssist</h1>
+        <p>1. Upload an image. 2. Ask a question.</p>
+        
+        <div class="upload-btn-wrapper">
+            Choose File <input type="file" id="image-input" accept="image/*">
+        </div>
+
+        <div class="lang-switcher">
+            <button id="lang-en" class="lang-btn active">English</button>
+            <button id="lang-hi" class="lang-btn">हिन्दी</button>
+        </div>
+        
+        <img id="image-preview" src="#" alt="Your Image" />
+        <div id="loader"></div>
+        <div id="results"></div>
+        
+        <div id="qna" style="display: none;">
+            <hr>
+            <h3>Ask a Question</h3>
+            <p id="mic-status">Tap the mic to ask about your result.</p>
+            <button id="mic-btn">🎤</button>
+            <div id="qna-loader"></div>
+            <div id="qna-answer"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        // All element getters
+        const imageInput = document.getElementById('image-input');
+        const imagePreview = document.getElementById('image-preview');
+        const resultsDiv = document.getElementById('results');
+        const loader = document.getElementById('loader');
+        const langEnBtn = document.getElementById('lang-en');
+        const langHiBtn = document.getElementById('lang-hi');
+        const qnaDiv = document.getElementById('qna');
+        const qnaLoader = document.getElementById('qna-loader');
+        const qnaAnswerDiv = document.getElementById('qna-answer');
+        const micBtn = document.getElementById('mic-btn');
+        const micStatus = document.getElementById('mic-status');
+
+        let currentLang = 'en';
+        let currentFile = null;
+
+        // Speech Synthesis and Recognition setup
+        const synth = window.speechSynthesis;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        // Event Listeners
+        langEnBtn.addEventListener('click', () => setLanguage('en'));
+        langHiBtn.addEventListener('click', () => setLanguage('hi'));
+        imageInput.addEventListener('change', handleImageUpload);
+        micBtn.addEventListener('click', handleMicTap);
+        
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            micStatus.textContent = `You asked: "${transcript}"`;
+            askQuestion(transcript);
+        };
+        recognition.onstart = () => micBtn.classList.add('listening');
+        recognition.onend = () => micBtn.classList.remove('listening');
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            synth.cancel();
+            langEnBtn.classList.toggle('active', lang === 'en');
+            langHiBtn.classList.toggle('active', lang === 'hi');
+            if (currentFile) getPrediction(currentFile);
+        }
+
+        function handleImageUpload(event) {
+            currentFile = event.target.files[0];
+            if (currentFile) {
+                synth.cancel();
+                imagePreview.src = URL.createObjectURL(currentFile);
+                imagePreview.style.display = 'block';
+                resultsDiv.innerHTML = ''; 
+                qnaDiv.style.display = 'none';
+                qnaAnswerDiv.innerHTML = '';
+                getPrediction(currentFile);
+            }
+        }
+
+        function handleMicTap() {
+            if (recognition.recognizing) {
+                recognition.stop();
+            } else {
+                recognition.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
+                recognition.start();
+                micStatus.textContent = "Listening...";
+            }
+        }
+
+        async function getPrediction(file) {
+            loader.style.display = 'block';
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const response = await fetch(`${API_URL}/predict?lang=${currentLang}`, { method: 'POST', body: formData });
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                displayResults(data);
+                qnaDiv.style.display = 'block'; // Show the Q&A section
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color:red;"><b>Error:</b> Could not connect to the backend server. Is it running?</p>`;
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        async function askQuestion(question) {
+            qnaLoader.style.display = 'block';
+            qnaAnswerDiv.innerHTML = '';
+            try {
+                const response = await fetch(`${API_URL}/ask`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                displayAnswer(data);
+            } catch (error) {
+                qnaAnswerDiv.innerHTML = `<p style="color:red;"><b>Error:</b> Could not get an answer from the Q&A system.</p>`;
+            } finally {
+                qnaLoader.style.display = 'none';
+            }
+        }
+
+        function displayResults(data) {
+            const textToSpeak = data.recommended_aids.join('. ');
+            let recommendationsHtml = data.recommended_aids.map(rec => `<li>${rec}</li>`).join('');
+            resultsDiv.innerHTML = `
+                <h2>${data.disease_name}<button id="speak-btn" title="Read aloud">🔊</button></h2>
+                <p><b>Confidence:</b> ${Math.round(parseFloat(data.confidence_score) * 100)}%</p>
+                <h3>Recommendations:</h3><ul>${recommendationsHtml}</ul>
+            `;
+            document.getElementById('speak-btn').addEventListener('click', () => speak(textToSpeak));
+        }
+        
+        function displayAnswer(data) {
+            qnaAnswerDiv.innerHTML = `<p><strong>Answer from Knowledge Base:</strong> ${data.answer}</p><small>Source: ${data.source}</small>`;
+            speak(data.answer);
+        }
+
+        function speak(text) {
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
+            synth.speak(utterance);
+        }
+    </script>
+</body>
+</html>
